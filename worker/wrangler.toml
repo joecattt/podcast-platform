@@ -1,0 +1,12 @@
+name = "podcast-platform-token"
+main = "src/index.ts"
+compatibility_date = "2025-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Set via: wrangler secret put LIVEKIT_API_KEY
+#         wrangler secret put LIVEKIT_API_SECRET
+#         wrangler secret put LIVEKIT_WS_URL
+#         wrangler secret put FIREBASE_PROJECT_ID
+
+[observability]
+enabled = true
