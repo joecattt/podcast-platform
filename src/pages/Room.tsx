@@ -15,7 +15,10 @@ import { useAuth } from '../lib/auth';
 import { fetchLiveKitToken, LIVEKIT_WS_URL } from '../lib/livekit';
 import { getRoom, setRecording, watchRoom, type Room as RoomDoc } from '../lib/rooms';
 import { ChunkedRecorder } from '../lib/recording';
+import { createEpisodeForRoom } from '../lib/episodes';
+import { triggerPipeline } from '../lib/pipeline';
 import { Button } from '../components/Button';
+import { useParticipants } from '@livekit/components-react';
 
 export function Room() {
   const { id } = useParams<{ id: string }>();
@@ -83,6 +86,7 @@ export function Room() {
 
 function RoomInner({ room, isHost }: { room: RoomDoc; isHost: boolean }) {
   const { localParticipant } = useLocalParticipant();
+  const participants = useParticipants();
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -133,7 +137,26 @@ function RoomInner({ room, isHost }: { room: RoomDoc; isHost: boolean }) {
 
   async function toggleHostRecording() {
     if (!isHost) return;
-    await setRecording(room.id, !hostRecording);
+    const next = !hostRecording;
+
+    if (next) {
+      // Starting — create the episode doc so the dashboard reflects it.
+      const guestNames = participants.map((p) => p.name || p.identity);
+      try {
+        await createEpisodeForRoom(room.id, room.name, guestNames);
+      } catch (e) {
+        console.warn('createEpisode failed', e);
+      }
+      await setRecording(room.id, true);
+    } else {
+      // Stopping — flip flag (clients finalize uploads), then trigger pipeline.
+      await setRecording(room.id, false);
+      try {
+        await triggerPipeline(room.id);
+      } catch (e) {
+        console.warn('Pipeline trigger failed (will need manual retry):', e);
+      }
+    }
   }
 
   return (

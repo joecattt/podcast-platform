@@ -1,10 +1,29 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+
+    function isHost() {
+      return request.auth != null
+          && request.auth.token.email == 'whitehat@joecattt.com';
+    }
+
+    // Show-level assets (intro video, logo) — host only.
+    match /show/{file=**} {
+      allow read: if request.auth != null;
+      allow write: if isHost();
+    }
+
     // Each participant writes only to their own folder under their room.
     match /recordings/{roomId}/{identity}/{file=**} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.uid == identity;
+    }
+
+    // Pipeline outputs (final stitched MP4, Shorts, transcripts) — host read,
+    // pipeline writes via admin SDK (bypasses rules).
+    match /episodes/{episodeId}/{file=**} {
+      allow read: if request.auth != null;
+      allow write: if isHost();
     }
   }
 }
