@@ -1,0 +1,33 @@
+{
+  "name": "podcast-platform-pipeline",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "process:local": "tsx src/cli/run-local.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "@google-cloud/storage": "^7.13.0",
+    "@remotion/bundler": "^4.0.286",
+    "@remotion/cli": "^4.0.286",
+    "@remotion/renderer": "^4.0.286",
+    "execa": "^9.5.1",
+    "express": "^4.21.1",
+    "firebase-admin": "^12.6.0",
+    "remotion": "^4.0.286",
+    "tsx": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.6.0"
+  }
+}

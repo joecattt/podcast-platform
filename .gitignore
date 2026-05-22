@@ -31,3 +31,8 @@ dist-ssr
 .firebase/
 functions/lib/
 functions/node_modules/
+
+# Pipeline
+pipeline/node_modules/
+pipeline/dist/
+worker/node_modules/
